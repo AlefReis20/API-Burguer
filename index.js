@@ -14,7 +14,7 @@ const checkOrderId = ((request, response, next) => {
     
 
     if(index < 0) {
-        return response.status(404).json({ error: "User Not Found" })
+        return response.status(404).json({ error: "Order Not Found" })
     }
 
     request.orderIndex = index
@@ -76,13 +76,15 @@ app.get('/orders/:id', checkOrderId, method, (request, response) => {
 app.patch('/orders/:id', checkOrderId, method, (request, response) => {
     const index = request.orderIndex
     const id = request.orderId
-    const { order, clientName, price} = request.body
 
-    const newStatus = { id, order, clientName, price, status:"Pronto" }
+ 
+    
+    const readyOrder = orders[index]
+    readyOrder.status = "Pronto"
 
-    orders[index] = newStatus
+    orders[index] = readyOrder
 
-    return response.json(newStatus)
+    return response.json(orders)
 })
 
 
