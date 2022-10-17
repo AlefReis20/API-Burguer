@@ -3,17 +3,18 @@ const port = 4000
 const { request, response } = require('express')
 const express = require('express')
 const uuid = require('uuid')
+const cors = require('cors')
 const app = express()
 app.use(express.json())
+app.use(cors())
 
 const orders = []
 
 const checkOrderId = ((request, response, next) => {
     const { id } = request.params
     const index = orders.findIndex(order => order.id === id)
-    
 
-    if(index < 0) {
+    if (index < 0) {
         return response.status(404).json({ error: "Order Not Found" })
     }
 
@@ -29,11 +30,10 @@ const method = ((request, response, next) => {
     next()
 })
 
+app.post('/orders', method, (request, response) => {
+    const { order, name, price } = request.body
 
-app.post('/orders', method, (request, response) =>{
-    const {  order, clientName, price } = request.body
-
-    const newOrder = { id:uuid.v4(), order, clientName, price, status: "Em preparação" }
+    const newOrder = { id: uuid.v4(), order, name, price, status: "Em preparação" }
 
     orders.push(newOrder)
 
@@ -47,23 +47,22 @@ app.get('/orders', method, (request, response) => {
 app.put('/orders/:id', checkOrderId, method, (request, response) => {
     const index = request.orderIndex
     const id = request.orderId
-    const { order, clientName, price, status} = request.body
+    const { order, name, price, status } = request.body
 
-    const alteredOrder = { id, order, clientName, price, status }
+    const alteredOrder = { id, order, name, price, status }
 
     orders[index] = alteredOrder
 
     return response.json(alteredOrder)
 
 })
-
 app.delete('/orders/:id', checkOrderId, method, (request, response) => {
     const index = request.orderIndex
 
-    orders.splice(index,1)
+    orders.splice(index, 1)
 
     return response.status(204).json()
-}) 
+})
 
 app.get('/orders/:id', checkOrderId, method, (request, response) => {
     const id = request.orderId
@@ -77,8 +76,6 @@ app.patch('/orders/:id', checkOrderId, method, (request, response) => {
     const index = request.orderIndex
     const id = request.orderId
 
- 
-    
     const readyOrder = orders[index]
     readyOrder.status = "Pronto"
 
@@ -96,6 +93,6 @@ app.patch('/orders/:id', checkOrderId, method, (request, response) => {
 
 
 
-app.listen(port, () =>{
+app.listen(port, () => {
     console.log(`🚀Server Started on port ${port}🚀`)
 })
