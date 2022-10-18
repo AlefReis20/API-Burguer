@@ -83,16 +83,4 @@ app.patch('/orders/:id', checkOrderId, method, (request, response) => {
 
     return response.json(orders)
 })
-
-
-
-
-
-
-
-
-
-
-app.listen(port, () => {
-    console.log(`🚀Server Started on port ${port}🚀`)
-})
+app.listen(process.env.PORT || port)
